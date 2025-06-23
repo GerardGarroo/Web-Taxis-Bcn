@@ -1,0 +1,13 @@
+# Node
+node_modules/
+
+# Entornos
+.env
+
+# Editores
+.vscode/
+.idea/
+
+# SO
+.DS_Store
+Thumbs.db
