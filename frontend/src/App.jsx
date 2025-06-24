@@ -1,27 +1,23 @@
 
 import React, { useState } from 'react';
-// Actualiza las importaciones para apuntar a los nuevos archivos .jsx
 import { useAuth } from './context/AuthContext.jsx';
 import LoginForm from './components/Auth/LoginForm.jsx';
 import RegisterForm from './components/Auth/RegisterForm.jsx';
+// Importa el nuevo componente ClientDashboard
+import ClientDashboard from './pages/ClientDashboard.jsx';
 
-// Componentes de Dashboard (Placeholders por ahora)
-// Estos se crearán más adelante cuando avancemos en la funcionalidad
-const ClientDashboard = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-    <div className="bg-white p-8 rounded-lg shadow-md text-center">
-      <h2 className="text-3xl font-bold text-gray-800 mb-4">Panel de Cliente</h2>
-      <p className="text-gray-600">¡Bienvenido, cliente! Aquí podrás solicitar tu taxi.</p>
-    </div>
-  </div>
-);
-
+// Componente DriverDashboard (Placeholder por ahora, se desarrollará más adelante)
 const DriverDashboard = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-    <div className="bg-white p-8 rounded-lg shadow-md text-center">
-      <h2 className="text-3xl font-bold text-gray-800 mb-4">Panel de Taxista</h2>
-      <p className="text-gray-600">¡Bienvenido, taxista! Aquí podrás ver y aceptar servicios.</p>
+  <div className="driver-dashboard-container">
+    <div className="dashboard-header">
+      <h1 className="dashboard-title">Panel de Taxista</h1>
+      <p className="dashboard-welcome-message">¡Bienvenido, taxista! Aquí podrás ver y aceptar servicios.</p>
+      {/* Botón de cerrar sesión para taxistas */}
+      <button onClick={() => { /* Lógica de logout */ }} className="logout-button">
+        Cerrar Sesión (Taxista)
+      </button>
     </div>
+    {/* Contenido específico del dashboard del taxista */}
   </div>
 );
 
@@ -34,44 +30,41 @@ const DriverDashboard = () => (
  * Utiliza el AuthContext para acceder al estado global de autenticación.
  */
 function App() {
-  // Obtenemos el usuario actual y el estado de carga desde nuestro contexto de autenticación
   const { currentUser, loading } = useAuth();
-  // Estado para controlar qué formulario de autenticación se muestra
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-  // Si la autenticación aún está cargando, mostramos un mensaje o spinner
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-lg font-medium text-gray-700">Cargando autenticación...</p>
+      <div className="loading-screen">
+        <p>Cargando autenticación...</p>
       </div>
     );
   }
 
-  // Si el usuario está autenticado, mostramos el dashboard correspondiente a su rol
   if (currentUser) {
-    // Si currentUser.role no está definido (por ejemplo, si el documento en Firestore no se encontró),
-    // asumimos por defecto que es un cliente.
+    // Renderiza ClientDashboard si es cliente
+    if (currentUser.role === 'client') {
+      return <ClientDashboard />;
+    }
+    // Renderiza DriverDashboard si es taxista
     if (currentUser.role === 'driver') {
       return <DriverDashboard />;
     }
-    return <ClientDashboard />; // Por defecto, si no es taxista o el rol no está definido, es cliente
+    // Fallback por si el rol no está definido o es inesperado
+    return <ClientDashboard />; // Por defecto, si el rol no se detecta, se asume cliente
   }
 
-  // Si no hay usuario autenticado, mostramos los formularios de login/registro
   return (
     <div className="app-container">
       {showRegisterForm ? (
-        // Si showRegisterForm es true, mostramos el formulario de registro
         <RegisterForm
-          onSuccess={() => setShowRegisterForm(false)} // Si el registro es exitoso, volvemos al login
-          onSwitchToLogin={() => setShowRegisterForm(false)} // Permitir cambiar a login
+          onSuccess={() => setShowRegisterForm(false)}
+          onSwitchToLogin={() => setShowRegisterForm(false)}
         />
       ) : (
-        // Si no, mostramos el formulario de inicio de sesión
         <LoginForm
-          onSuccess={() => {}} // El éxito del login es manejado por el onAuthStateChanged en AuthContext
-          onSwitchToRegister={() => setShowRegisterForm(true)} // Permitir cambiar a registro
+          onSuccess={() => {}}
+          onSwitchToRegister={() => setShowRegisterForm(true)}
         />
       )}
     </div>
