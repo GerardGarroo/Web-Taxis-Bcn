@@ -1,36 +1,37 @@
 
-/* global __app_id, __firebase_config, __initial_auth_token */
+/* global __app_id, __initial_auth_token */ // Eliminado __firebase_config de aquí
 
 // Importa las funciones necesarias del SDK de Firebase
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, signInWithCustomToken } from 'firebase/auth'; // Eliminado onAuthStateChanged de aquí
+import { getAuth, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Define las variables globales que Canvas proporciona para la configuración de Firebase
-// __app_id: ID de la aplicación, útil para estructurar datos en Firestore si usas colecciones públicas/privadas.
-// __firebase_config: Objeto de configuración JSON para inicializar Firebase.
-// __initial_auth_token: Token de autenticación inicial para iniciar sesión.
-
-// Verifica si las variables globales están definidas. Si no, usa valores por defecto (solo para desarrollo local si no están inyectadas).
+// Define appId para que sea accesible. Utiliza __app_id del entorno de Canvas si está disponible.
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-  // Configuración de Firebase de ejemplo (reemplaza con tus propias credenciales si no estás en Canvas)
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+
+// Configuración de Firebase.
+// Si estás en el entorno de Canvas, usará __firebase_config.
+// Si estás desarrollando localmente, DEBES REEMPLAZAR ESTOS VALORES CON TUS PROPIOS REALES DE FIREBASE.
+const firebaseConfig = {
+  apiKey: "AIzaSyByiTOwTgwILDccVKfrcNcQGRNnJP1ZY00",
+  authDomain: "taxis-bcn.firebaseapp.com",
+  projectId: "taxis-bcn",
+  storageBucket: "taxis-bcn.firebasestorage.app",
+  messagingSenderId: "533003215921",
+  appId: "1:533003215921:web:f534385e00ce15baf9a110"
 };
+
+// initialAuthToken es proporcionado por el entorno de Canvas para la autenticación inicial.
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
 // Inicializa la aplicación Firebase con la configuración proporcionada
+// Si 'app' no estaba definida antes, este es el punto donde se crea.
 const app = initializeApp(firebaseConfig);
 
-// Obtiene la instancia de autenticación de Firebase
+// Obtiene la instancia de autenticación de Firebase a partir de la app inicializada
 const auth = getAuth(app);
 
-// Obtiene la instancia de Firestore (base de datos)
+// Obtiene la instancia de Firestore (base de datos) a partir de la app inicializada
 const db = getFirestore(app);
 
 // Función para manejar el inicio de sesión inicial
@@ -54,5 +55,10 @@ const initializeFirebaseAuth = async () => {
 };
 
 // Exporta las instancias de Firebase para que puedan ser utilizadas en otros archivos
+// Asegúrate de que 'app', 'auth', 'db', 'initializeFirebaseAuth', 'appId' estén correctamente definidas arriba.
 export { app, auth, db, initializeFirebaseAuth, appId };
+
+
+
+
 

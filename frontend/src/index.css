@@ -1,34 +1,238 @@
-/* src/index.css */
 
+/* Estilos globales y para el cuerpo */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  padding: 2rem;
+  margin: 0;
+  font-family: 'Arial', sans-serif; /* Usando tu fuente preferida, Arial */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5; /* Un gris claro de fondo */
+  color: #333;
 }
 
-form {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  max-width: 400px;
-  margin: auto;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+/* Contenedor de la página de Login y Register (fondo general oscuro) */
+.login-page-container,
+.register-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1a202c; /* Fondo gris muy oscuro, casi negro */
+  overflow: hidden;
+  padding: 1rem;
 }
 
-input {
+/* Tarjeta de formulario base (para login y register) */
+.login-form-card,
+.register-form-card {
+  background-color: #ffffff; /* Fondo blanco para la tarjeta */
+  padding: 2rem; /* 32px */
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Sombra suave */
   width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  max-width: 24rem; /* 384px */
+  transform: scale(1);
+  transition: transform 0.3s ease-in-out;
 }
 
-button {
-  padding: 10px 20px;
-  background-color: #007aff;
-  color: white;
+.login-form-card:hover,
+.register-form-card:hover {
+  transform: scale(1.02); /* Pequeño zoom al pasar el ratón */
+}
+
+/* Título del formulario */
+.form-title {
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700; /* bold */
+  color: #FFD700; /* ¡Amarillo taxi! */
+  margin-bottom: 1.5rem; /* 24px */
+  text-align: center;
+  text-shadow: 1px 1px 2px #000000; /* Sombra de texto negra */
+}
+
+/* Espaciado para los elementos del formulario */
+.form-elements {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Espacio entre los grupos de input */
+}
+
+/* Grupo de input y label */
+.form-group {
+  margin-bottom: 0.5rem; /* 8px */
+}
+
+/* Etiquetas de los campos */
+.form-label {
+  display: block;
+  color: #333333; /* Gris oscuro para las etiquetas */
+  font-size: 0.875rem; /* 14px */
+  font-weight: 700; /* bold */
+  margin-bottom: 0.5rem; /* 8px */
+}
+
+/* Campos de entrada (input, select) */
+.form-input {
+  appearance: none;
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.75rem; /* 10px vertical, 12px horizontal */
+  border: 1px solid #cccccc; /* Borde gris claro */
+  border-radius: 0.25rem; /* 4px */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* Sombra interna sutil */
+  color: #2d3748; /* Gris oscuro para el texto del input */
+  line-height: 1.25;
+  outline: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-input:focus {
+  border-color: #FFD700; /* ¡Borde amarillo al enfocar! */
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5); /* Sombra amarilla al enfocar */
+}
+
+/* Contenedor de acciones (botones) */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+/* Botón principal (Iniciar Sesión/Registrarse) */
+.form-button {
+  position: relative; /* Necesario para la animación del taxi */
+  background-color: #000000; /* ¡Fondo negro! */
+  color: #FFD700; /* ¡Texto amarillo! */
+  font-weight: 700;
+  font-size: 18px;
+  padding: 0.75rem 1rem; /* 12px vertical, 16px horizontal */
+  border-radius: 0.25rem; /* 4px */
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+  flex-grow: 1; /* Para que ocupe el espacio disponible */
+  margin-right: 0.5rem; /* Margen para separación si hay otro botón */
+  display: flex; /* Añadido para centrar el contenido y el taxi */
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center; /* Centrar verticalmente */
+}
+
+.form-button:hover {
+  background-color: #333333; /* Un negro un poco más claro al pasar el ratón */
+  transform: scale(1.02);
+}
+
+.form-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animación del taxi en el botón */
+.form-button::before {
+  content: "🚕"; /* Emoji de taxi */
+  position: relative; /* Cambiado a relative para el 'bote' */
+  margin-right: 10px; /* Espacio entre el taxi y el texto del botón */
+  font-size: 24px;
+  animation: taxiBounce 1s infinite alternate; /* Nueva animación de 'bote' */
+}
+
+/* Nueva keyframes para la animación de 'bote' */
+@keyframes taxiBounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px); /* Se mueve 5px hacia arriba */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Botón de enlace (para cambiar a login/register) */
+.form-link-button {
+  background: none;
+  border: none;
+  color: #FFD700; /* ¡Texto amarillo para el enlace! */
+  font-weight: 700;
+  font-size: 0.875rem; /* 14px */
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+  padding: 0.5rem;
+}
+
+.form-link-button:hover {
+  color: #CCCC00; /* Amarillo más oscuro al pasar el ratón */
+  text-decoration: underline;
+}
+
+/* Clase para el texto del pie de formulario (No tienes cuenta? Regístrate) */
+.form-footer-text {
+  text-align: center; /* Centra el texto */
+  margin-top: 1.5rem; /* Margen superior para separarlo de los botones */
+  font-size: 0.875rem; /* Tamaño de fuente */
+  color: #666666; /* Un gris suave */
+}
+
+/* Clase para mensajes de error (si se usa en el futuro en el HTML) */
+.error-message {
+  color: red; /* Mantenemos el rojo para errores por claridad */
+  font-weight: 600;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+
+/* Estilos para MessageBox (mantengo los colores funcionales por claridad) */
+.message-box {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+.message-box-content {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.message-box-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: inherit;
+  line-height: 1;
+  padding: 0.25rem;
+  border-radius: 50%;
+}
+
+/* Colores para MessageBox por tipo (se mantienen por su función informativa) */
+.message-box-info {
+  background-color: #e0f2f7;
+  border-color: #00bcd4;
+  color: #00838f;
+}
+.message-box-success {
+  background-color: #e8f5e9;
+  border-color: #4caf50;
+  color: #2e7d32;
+}
+.message-box-error {
+  background-color: #ffebee;
+  border-color: #ef5350;
+  color: #c62828;
 }

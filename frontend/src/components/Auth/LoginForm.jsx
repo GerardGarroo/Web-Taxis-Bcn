@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth'; // Importa la función de inicio de sesión de Firebase Auth
-import { useAuth } from '../../context/AuthContext'; // Importa nuestro hook personalizado de autenticación
-import MessageBox from '../UI/MessageBox'; // Importa el componente de mensajes
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../../context/AuthContext.jsx';
+import MessageBox from '../UI/MessageBox.jsx';
 
 /**
  * LoginForm Component
@@ -12,38 +12,33 @@ import MessageBox from '../UI/MessageBox'; // Importa el componente de mensajes
  * Utiliza Firebase Authentication para la lógica de inicio de sesión y muestra
  * mensajes de estado (éxito/error) usando el componente MessageBox.
  *
- * Se ha añadido validación del lado del cliente para el formato del correo electrónico.
+ * Este componente integra el diseño del usuario utilizando clases CSS estándar.
  *
  * @param {object} props - Las propiedades del componente.
  * @param {function} props.onSuccess - Callback a ejecutar si el inicio de sesión es exitoso.
  * @param {function} props.onSwitchToRegister - Callback para cambiar al formulario de registro.
  */
 const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
-  const [email, setEmail] = useState(''); // Estado para el campo de correo electrónico
-  const [password, setPassword] = useState(''); // Estado para el campo de contraseña
-  const [error, setError] = useState(null); // Estado para almacenar mensajes de error
-  const [message, setMessage] = useState(null); // Estado para almacenar mensajes generales
-  const [messageType, setMessageType] = useState('info'); // Estado para el tipo de mensaje (success, error, info)
-  const [isLoading, setIsLoading] = useState(false); // Estado para controlar si la operación está cargando
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState('info');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Obtenemos la instancia de 'auth' desde nuestro contexto de autenticación
   const { auth } = useAuth();
 
-  // Función para validar el formato del correo electrónico
   const validateEmail = (email) => {
-    // Regex simple para email
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
 
-  // Función para manejar el envío del formulario de inicio de sesión
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario de recargar la página
-    setError(null); // Limpia cualquier error anterior
-    setMessage(null); // Limpia cualquier mensaje anterior
-    setIsLoading(true); // Activa el estado de carga
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+    setIsLoading(true);
 
-    // Validación del lado del cliente: formato de email
     if (!validateEmail(email)) {
       setError('Por favor, introduce un correo electrónico válido.');
       setMessageType('error');
@@ -52,22 +47,17 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
     }
 
     try {
-      // Intenta iniciar sesión con el correo electrónico y la contraseña proporcionados
       await signInWithEmailAndPassword(auth, email, password);
-      // Si el inicio de sesión es exitoso, muestra un mensaje de éxito
       setMessage('¡Inicio de sesión exitoso!');
       setMessageType('success');
-      // Ejecuta el callback onSuccess si se proporciona
       if (onSuccess) {
-        // Un pequeño retraso para que el usuario vea el mensaje de éxito antes de redirigir
         setTimeout(() => onSuccess(), 1500);
       }
     } catch (err) {
-      // Si ocurre un error, captura el código del error de Firebase y muestra un mensaje amigable
       let errorMessage = 'Error al iniciar sesión. Por favor, inténtalo de nuevo.';
       switch (err.code) {
         case 'auth/invalid-email':
-          errorMessage = 'El formato del correo electrónico es inválido.'; // Podría ocurrir si la validación del cliente se saltó
+          errorMessage = 'El formato del correo electrónico es inválido.';
           break;
         case 'auth/user-disabled':
           errorMessage = 'Este usuario ha sido deshabilitado.';
@@ -76,82 +66,81 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
         case 'auth/wrong-password':
           errorMessage = 'Correo electrónico o contraseña incorrectos.';
           break;
+          case 'auth/network-request-failed':
+            errorMessage = 'Problema de conexión a la red. Inténtalo de nuevo.';
+            break;
         case 'auth/too-many-requests':
           errorMessage = 'Demasiados intentos fallidos. Por favor, inténtalo más tarde.';
           break;
         default:
-          errorMessage = `Error: ${err.message}`; // Mensaje genérico para otros errores
+          errorMessage = `Error: ${err.message}`;
           console.error("Error de inicio de sesión:", err);
       }
-      setError(errorMessage); // Establece el mensaje de error
-      setMessageType('error'); // Establece el tipo de mensaje como error
+      setError(errorMessage);
+      setMessageType('error');
     } finally {
-      setIsLoading(false); // Desactiva el estado de carga
+      setIsLoading(false);
     }
   };
 
-  // Función para cerrar los mensajes (éxito/error)
   const handleCloseMessage = () => {
     setError(null);
     setMessage(null);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4 sm:p-6">
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-t-4 border-indigo-700 transform hover:scale-105 transition-transform duration-300 ease-in-out">
-        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-8">
-          Iniciar Sesión
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Correo Electrónico
+    <div className="login-page-container">
+      <div className="login-form-card">
+        <h2 className="form-title">Inicia sesión</h2>
+        <form onSubmit={handleSubmit} className="form-elements">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email
             </label>
             <input
+              type="email"
               id="email"
               name="email"
-              type="email"
-              autoComplete="email"
-              required
-              className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+              className="form-input"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@ejemplo.com"
+              required
             />
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
               Contraseña
             </label>
             <input
+              type="password"
               id="password"
               name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+              className="form-input"
+              placeholder="*************"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              required
             />
           </div>
-          <div>
+          <div className="form-actions">
             <button
               type="submit"
-              disabled={isLoading} // Deshabilita el botón mientras está cargando
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+              className="form-button"
             >
-              {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+              {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
             </button>
           </div>
         </form>
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+        {/* Este div ha sido actualizado con la nueva clase para centrar el texto */}
+        <div className="form-footer-text">
+          <p>
             ¿No tienes cuenta?{' '}
             <button
               type="button"
-              onClick={onSwitchToRegister} // Llama al callback para cambiar al registro
-              className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline"
+              onClick={onSwitchToRegister}
+              className="form-link-button"
             >
               Regístrate aquí
             </button>
@@ -159,7 +148,6 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
         </div>
       </div>
 
-      {/* Muestra el MessageBox si hay un mensaje o error */}
       {(message || error) && (
         <MessageBox
           message={message || error}
