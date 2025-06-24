@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { useAuth } from './context/AuthContext'; // Importa el hook useAuth de nuestro contexto
-import LoginForm from './components/Auth/LoginForm'; // Importa el componente LoginForm
-import RegisterForm from './components/Auth/RegisterForm'; // Importa el componente RegisterForm
+// Actualiza las importaciones para apuntar a los nuevos archivos .jsx
+import { useAuth } from './context/AuthContext.jsx';
+import LoginForm from './components/Auth/LoginForm.jsx';
+import RegisterForm from './components/Auth/RegisterForm.jsx';
 
 // Componentes de Dashboard (Placeholders por ahora)
 // Estos se crearán más adelante cuando avancemos en la funcionalidad

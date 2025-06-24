@@ -12,6 +12,8 @@ import MessageBox from '../UI/MessageBox'; // Importa el componente de mensajes
  * Utiliza Firebase Authentication para la lógica de inicio de sesión y muestra
  * mensajes de estado (éxito/error) usando el componente MessageBox.
  *
+ * Se ha añadido validación del lado del cliente para el formato del correo electrónico.
+ *
  * @param {object} props - Las propiedades del componente.
  * @param {function} props.onSuccess - Callback a ejecutar si el inicio de sesión es exitoso.
  * @param {function} props.onSwitchToRegister - Callback para cambiar al formulario de registro.
@@ -25,8 +27,14 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
   const [isLoading, setIsLoading] = useState(false); // Estado para controlar si la operación está cargando
 
   // Obtenemos la instancia de 'auth' desde nuestro contexto de autenticación
-  // que nos permite interactuar con Firebase Authentication.
   const { auth } = useAuth();
+
+  // Función para validar el formato del correo electrónico
+  const validateEmail = (email) => {
+    // Regex simple para email
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
 
   // Función para manejar el envío del formulario de inicio de sesión
   const handleSubmit = async (e) => {
@@ -34,6 +42,14 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
     setError(null); // Limpia cualquier error anterior
     setMessage(null); // Limpia cualquier mensaje anterior
     setIsLoading(true); // Activa el estado de carga
+
+    // Validación del lado del cliente: formato de email
+    if (!validateEmail(email)) {
+      setError('Por favor, introduce un correo electrónico válido.');
+      setMessageType('error');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Intenta iniciar sesión con el correo electrónico y la contraseña proporcionados
@@ -51,7 +67,7 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }) => {
       let errorMessage = 'Error al iniciar sesión. Por favor, inténtalo de nuevo.';
       switch (err.code) {
         case 'auth/invalid-email':
-          errorMessage = 'El formato del correo electrónico es inválido.';
+          errorMessage = 'El formato del correo electrónico es inválido.'; // Podría ocurrir si la validación del cliente se saltó
           break;
         case 'auth/user-disabled':
           errorMessage = 'Este usuario ha sido deshabilitado.';

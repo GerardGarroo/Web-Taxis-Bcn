@@ -14,6 +14,8 @@ import MessageBox from '../UI/MessageBox'; // Importa el componente de mensajes
  * se guardan en Firebase Authentication y Cloud Firestore.
  * Muestra mensajes de estado (éxito/error) usando el componente MessageBox.
  *
+ * Se ha mejorado la validación del lado del cliente para email y contraseña.
+ *
  * @param {object} props - Las propiedades del componente.
  * @param {function} props.onSuccess - Callback a ejecutar si el registro es exitoso.
  * @param {function} props.onSwitchToLogin - Callback para cambiar al formulario de inicio de sesión.
@@ -28,8 +30,36 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
   const [messageType, setMessageType] = useState('info'); // Estado para el tipo de mensaje (success, error, info)
   const [isLoading, setIsLoading] = useState(false); // Estado para controlar si la operación está cargando
 
-  // Obtenemos la instancia de 'auth' y 'db' (Firestore) desde nuestro contexto de autenticación
+  // Obtenemos la instancia de 'auth', 'db' y 'appId' desde nuestro contexto de autenticación
   const { auth, db, appId } = useAuth(); // Asegúrate de que 'appId' se exporte desde useAuth o Firebase context
+
+  // Función para validar el formato del correo electrónico
+  const validateEmail = (email) => {
+    // Regex simple para email (se puede hacer más complejo si es necesario)
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  // Función para validar la complejidad de la contraseña
+  const validatePassword = (password) => {
+    if (password.length < 8) { // Mínimo 8 caracteres
+      return 'La contraseña debe tener al menos 8 caracteres.';
+    }
+    if (!/[A-Z]/.test(password)) { // Al menos una mayúscula
+      return 'La contraseña debe contener al menos una letra mayúscula.';
+    }
+    if (!/[a-z]/.test(password)) { // Al menos una minúscula
+      return 'La contraseña debe contener al menos una letra minúscula.';
+    }
+    if (!/[0-9]/.test(password)) { // Al menos un número
+      return 'La contraseña debe contener al menos un número.';
+    }
+    if (!/[!@#$%^&*()]/.test(password)) { // Al menos un símbolo
+      return 'La contraseña debe contener al menos un símbolo (!@#$%^&*()).';
+    }
+    return null; // La contraseña es válida
+  };
+
 
   // Función para manejar el envío del formulario de registro
   const handleSubmit = async (e) => {
@@ -38,16 +68,24 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
     setMessage(null); // Limpia cualquier mensaje anterior
     setIsLoading(true); // Activa el estado de carga
 
-    // Validación básica de contraseñas
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+    // Validaciones del lado del cliente
+    if (!validateEmail(email)) {
+      setError('Por favor, introduce un correo electrónico válido.');
       setMessageType('error');
       setIsLoading(false);
       return;
     }
 
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      setMessageType('error');
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden.');
       setMessageType('error');
       setIsLoading(false);
       return;
@@ -59,16 +97,14 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
       const user = userCredential.user;
 
       // 2. Guarda información adicional del usuario (como el rol) en Cloud Firestore
-      // Se utiliza el UID del usuario como ID del documento en la colección 'users'.
-      // La ruta sigue la estructura de datos privados: /artifacts/{appId}/users/{userId}/users/{documentId}
       const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/users`, user.uid);
 
       await setDoc(userDocRef, {
         email: user.email,
         role: role, // Guarda el rol seleccionado (client o driver)
         createdAt: new Date(),
-        profileImageUrl: '', // Se puede añadir más tarde
-        isVerified: role === 'driver' ? false : true, // Los taxistas necesitan verificación
+        profileImageUrl: '',
+        isVerified: role === 'driver' ? false : true, // Los taxistas necesitan verificación inicial
         isOnboarded: false, // Proceso de onboarding inicial
       });
 
@@ -99,7 +135,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
           errorMessage = 'El formato del correo electrónico es inválido.';
           break;
         case 'auth/weak-password':
-          errorMessage = 'La contraseña es demasiado débil (mínimo 6 caracteres).';
+          errorMessage = 'La contraseña es demasiado débil (mínimo 6 caracteres).'; // Firebase aún puede dar este si nuestra validación falla
           break;
         default:
           errorMessage = `Error: ${err.message}`;
@@ -153,7 +189,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
               required
               className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition duration-150 ease-in-out"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)} // CORREGIDO: Usar setPassword aquí
               placeholder="••••••••"
             />
           </div>

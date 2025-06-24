@@ -10,6 +10,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'; // Importa funciones d
 const AuthContext = createContext();
 
 // Hook personalizado para usar el contexto de autenticación fácilmente
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   return useContext(AuthContext);
 };
